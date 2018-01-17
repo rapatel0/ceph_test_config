@@ -1,0 +1,19 @@
+Host ceph-admin
+        Hostname ceph-admin
+        User cephuser
+Host mon1
+        Hostname mon1
+        User cephuser
+Host ceph-osd1
+        Hostname ceph-osd1
+        User cephuser
+Host ceph-osd2
+        Hostname ceph-osd2
+        User cephuser
+Host ceph-osd3
+        Hostname ceph-osd3
+        User cephuser
+Host ceph-client
+        Hostname ceph-client
+        User cephuser
+
