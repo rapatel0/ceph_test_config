@@ -52,7 +52,7 @@ sudo chmod +x /home/cephuser/.ssh/
 sudo chown -R cephuser:cephuser /home/cephuser/.ssh/
 sudo su cephuser
 sudo chmod 644 ~/.ssh/config
-ssh-keyscan node1 node2 node3 >> ~/.ssh/known_hosts
+ssh-keyscan admin node1 node2 node3 >> ~/.ssh/known_hosts
 
 
 sudo hostname "admin"
@@ -71,22 +71,38 @@ ssh -t cephuser@node3 "	sudo parted -s /dev/xvdb mklabel gpt mkpart primary xfs 
 
 mkdir ~/my-cluster
 cd ~/my-cluster
-ceph-deploy new node1
+ceph-deploy new node1 
 printf "public network = 10.100.16.0/16\n" >> ceph.conf
 printf "osd_max_object_name_len = 256\n" >> ceph.conf
 printf "osd_max_object_namespace_len = 64\n" >> ceph.conf
 printf "osd pool default size = 2\n" >> ceph.conf
+printf "echo ms bind ipv6 = true" >> ceph.conf
 
-ceph-deploy install node1 node2 node3
+
+ceph-deploy install --stable=luminous node1 node2 node3
 ceph-deploy mon create-initial
 ceph-deploy disk zap node1:/dev/xvdb node2:/dev/xvdb node3:/dev/xvdb
-ceph-deploy osd prepare node1:/dev/xvdb node2:/dev/xvdb node3:/dev/xvdb
 
+ssh -t cephuser@admin "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node1 "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node2 "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node3 "sudo chmod -R 644 /etc/ceph/"
 
-ceph-deploy osd activate node1:/dev/xvdb1 node2:/dev/xvdb1 node3:/dev/xvdb1
+ceph-deploy osd create node1:/dev/xvdb node2:/dev/xvdb node3:/dev/xvdb
+ssh -t cephuser@admin "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node1 "sudo chmod -R 644 /etc/ceph/ceph.client.admin.keyring"
+ssh -t cephuser@node2 "sudo chmod -R 644 /etc/ceph/ceph.client.admin.keyring"
+ssh -t cephuser@node3 "sudo chmod -R 644 /etc/ceph/ceph.client.admin.keyring"
+
 
 ceph-deploy admin node1 node2 node3
-ceph-deploy osd create node1:xvdb node2:xvdb node3:xvdb
+ssh -t cephuser@admin "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node1 "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node2 "sudo chmod -R 644 /etc/ceph/"
+ssh -t cephuser@node3 "sudo chmod -R 644 /etc/ceph/"
+
+
+
 
 
 
